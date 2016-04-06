@@ -96,7 +96,7 @@ msgid "GUI"
 msgstr "GUI"
 
 msgid "Game View Selection"
-msgstr "게임 뷰 셀렉션"
+msgstr "게임 목차 보기"
 
 msgid "Customize games path"
 msgstr "게임 경로 지정"
@@ -129,10 +129,10 @@ msgid "Credits to all contributors"
 msgstr "모든 참여진들의 크레딧"
 
 msgid "Game View TV"
-msgstr "TV 에서의 게임 화면"
+msgstr "TV 화면 설정"
 
 msgid "Game View DRC"
-msgstr "DRC 에서의 게임 화면"
+msgstr "터치패드 화면 설정"
 
 msgid "Game Path"
 msgstr "게임 경로"
