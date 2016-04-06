@@ -1,0 +1,153 @@
+# Loadiine GX2 language source file.
+# korean.lang - v0.1
+# don't delete/change this line (é).
+msgid ""
+msgstr ""
+"Project-Id-Version: Loadiine GX2\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2016-04-03 19:00+0200\n"
+"PO-Revision-Date: 2016-04-03 19:00+0200\n"
+"Last-Translator: Joonie\n"
+"Language-Team: R3BUG\n"
+"Language: 한국어\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Loadiine GX2"
+msgstr ""
+
+msgid "Official Site:"
+msgstr "공식 지원 포럼:"
+
+msgid "Coding:"
+msgstr "개발진:"
+
+msgid "Design:"
+msgstr "한글화"
+
+msgid "Some guy who doesn't want to be named."
+msgstr "Joonie"
+
+msgid "Testing:"
+msgstr "테스팅:"
+
+msgid "Cyan / Maschell / n1ghty / OnionKnight and many more"
+msgstr "Cyan / Maschell / n1ghty / OnionKnight 그 외분들"
+
+msgid "Social Presence:"
+msgstr "대변인:"
+
+msgid "Based on:"
+msgstr "바탕이 되는 코드:"
+
+msgid "Loadiine v4.0 by Golden45 and Dimok"
+msgstr "Golden45 과 Dimok의 Loadiine v4.0"
+
+msgid "Big thanks to:"
+msgstr "수고 하신 분들:"
+
+msgid "lustar for GameTDB and hosting covers / disc images"
+msgstr "GameTDB의 Lustar"
+
+msgid "Marionumber1 for his kernel exploit"
+msgstr "Marionumber1과 그의 익스플로잇"
+
+msgid "The whole libwiiu team and it's contributors."
+msgstr "libwiiu 팀과 그들의 노고.."
+
+msgid "Off"
+msgstr "끄기"
+
+msgid "On"
+msgstr "켜기"
+
+msgid "Icon Carousel"
+msgstr "아이콘식 보기"
+
+msgid "Grid View"
+msgstr "격자무늬식 보기"
+
+msgid "Cover Carousel"
+msgstr "커버뷰"
+
+msgid "Shared Mode"
+msgstr "공유 모드"
+
+msgid "Unique Mode"
+msgstr "유니크 모드"
+
+msgid "Mii Maker Mode"
+msgstr "미 메이커 모드"
+
+msgid "Smash Bros Mode"
+msgstr "대난투 모드"
+
+msgid "Karaoke Mode"
+msgstr "가라오케 모드"
+
+msgid "Art Atelier Mode"
+msgstr "아트 아틀리에 모드"
+
+msgid "Background customizations"
+msgstr "배경화면 설정"
+
+msgid "GUI"
+msgstr "GUI"
+
+msgid "Game View Selection"
+msgstr "게임 뷰 셀렉션"
+
+msgid "Customize games path"
+msgstr "게임 경로 지정"
+
+msgid "Customize save path"
+msgstr "세이브 경로 지정"
+
+msgid "Loader"
+msgstr "로더"
+
+msgid "Set save mode"
+msgstr "세이브 모드 설정"
+
+msgid "Adjust log server IP and port"
+msgstr "기록 서버 IP 와 포트 지정"
+
+msgid "Game"
+msgstr "게임"
+
+msgid "Launch method selection"
+msgstr "구동 모드 선택하기"
+
+msgid "Log server control"
+msgstr "기록 서버 설정"
+
+msgid "Credits"
+msgstr "크레딧"
+
+msgid "Credits to all contributors"
+msgstr "모든 참여진들의 크레딧"
+
+msgid "Game View TV"
+msgstr "TV 에서의 게임 화면"
+
+msgid "Game View DRC"
+msgstr "DRC 에서의 게임 화면"
+
+msgid "Game Path"
+msgstr "게임 경로"
+
+msgid "Game Save Path"
+msgstr "게임 저장 경로"
+
+msgid "Game Save Mode"
+msgstr "게임 저장 모드"
+
+msgid "Launch Mode"
+msgstr "구동 모드"
+
+msgid "Log Server Control"
+msgstr "기록 서버 설정"
+
+msgid "Log Server IP"
+msgstr "기록 서버 IP"
