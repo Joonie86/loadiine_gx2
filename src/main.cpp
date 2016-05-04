@@ -65,24 +65,10 @@ extern "C" int Menu_Main(void)
     //!*******************************************************************
     //!                       Patch Functions                            *
     //!*******************************************************************
-    // We need to check if padcon should be enabled before hooking the functions
-    log_printf("Load settings\n");
-    CSettings::instance()->Load();
-
-    int padmode = 0;
-    switch(CSettings::getValueAsU8(CSettings::PadconMode))
-    {
-        case PADCON_ENABLED: {
-            padmode = 1;
-            log_printf("Padcon enabled\n");
-            break;
-        }
-        default:
-            break;
-    }
-    
     log_printf("Patch FS and loader functions\n");
-    PatchMethodHooks(padmode);
+
+    PatchMethodHooks();
+    PatchSDK();
 
     //!*******************************************************************
     //!                    Setup exception handler                       *
@@ -98,9 +84,8 @@ extern "C" int Menu_Main(void)
     log_printf("Main application stopped\n");
 
     Application::destroyInstance();
-    
-    CSettings::instance()->Save();
-    CSettings::destroyInstance();
+
+
 
     log_printf("Unmount SD\n");
     unmount_sd_fat("sd");
@@ -111,4 +96,3 @@ extern "C" int Menu_Main(void)
 
     return 0;
 }
-

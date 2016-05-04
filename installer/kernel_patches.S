@@ -42,8 +42,58 @@
 
     #define BAT_SET_NOP_ADDR_8          0xFFEE10B8
     #define BAT_SET_NOP_ADDR_9          0xFFEE10BC
-#elif ( (VER == 400) || (VER == 410) )
+#elif VER == 410
     #define BAT_SETUP_HOOK_ADDR         0xFFF1AD00
+
+    #define BAT_SET_NOP_ADDR_1          0xFFF06708
+    #define BAT_SET_NOP_ADDR_2          0xFFF06794
+    #define BAT_SET_NOP_ADDR_3          0xFFF003C8
+    #define BAT_SET_NOP_ADDR_4          0xFFF003CC
+    #define BAT_SET_NOP_ADDR_5          0xFFF1ADE8
+    #define BAT_SET_NOP_ADDR_6          0xFFF1AE04
+    #define BAT_SET_NOP_ADDR_7          0xFFF1AF08
+
+    #define BAT_SET_NOP_ADDR_8          0xFFEE10B8
+    #define BAT_SET_NOP_ADDR_9          0xFFEE10BC
+#elif VER == 400
+    #define BAT_SETUP_HOOK_ADDR         0xFFF1A440
+
+    #define BAT_SET_NOP_ADDR_1          0xFFF066FC
+    #define BAT_SET_NOP_ADDR_2          0xFFF06788
+    #define BAT_SET_NOP_ADDR_3          0xFFF003C8
+    #define BAT_SET_NOP_ADDR_4          0xFFF003CC
+    #define BAT_SET_NOP_ADDR_5          0xFFF1A528
+    #define BAT_SET_NOP_ADDR_6          0xFFF1A544
+    //define BAT_SET_NOP_ADDR_7          not present in 400
+
+    #define BAT_SET_NOP_ADDR_8          0xFFEE0F50
+    #define BAT_SET_NOP_ADDR_9          0xFFEE0F54
+#elif (VER == 310)
+    #define BAT_SETUP_HOOK_ADDR         0xFFF19EC4
+
+    #define BAT_SET_NOP_ADDR_1          0xFFF06590
+    #define BAT_SET_NOP_ADDR_2          0xFFF0661C
+    #define BAT_SET_NOP_ADDR_3          0xFFF003C8
+    #define BAT_SET_NOP_ADDR_4          0xFFF003CC
+    #define BAT_SET_NOP_ADDR_5          0xFFF19FAC
+    #define BAT_SET_NOP_ADDR_6          0xFFF19FC8
+//  #define BAT_SET_NOP_ADDR_7          not present in 3.1.0
+
+    #define BAT_SET_NOP_ADDR_8          0xFFEE0FB0
+    #define BAT_SET_NOP_ADDR_9          0xFFEE0FB4
+#elif (VER == 300)
+    #define BAT_SETUP_HOOK_ADDR         0xFFF19E2C
+
+    #define BAT_SET_NOP_ADDR_1          0xFFF06590
+    #define BAT_SET_NOP_ADDR_2          0xFFF0661C
+    #define BAT_SET_NOP_ADDR_3          0xFFF003C8
+    #define BAT_SET_NOP_ADDR_4          0xFFF003CC
+    #define BAT_SET_NOP_ADDR_5          0xFFF19F14
+    #define BAT_SET_NOP_ADDR_6          0xFFF19F30
+//  #define BAT_SET_NOP_ADDR_7          not present in 3.0.x
+
+    #define BAT_SET_NOP_ADDR_8          0xFFEE0DB8
+    #define BAT_SET_NOP_ADDR_9          0xFFEE0DBC
 #else
     #error Please define valid values for kernel setup.
 #endif
@@ -55,7 +105,13 @@
 #endif
 
 #define BAT4U_VAL                       0x008000FF
-#define BAT4L_VAL                       0x30800012
+#if VER >= 410
+    #define BAT4L_VAL                   0x30800012
+#elif VER <= 400
+    #define BAT4L_VAL                   0x4E800012
+#else
+    #error Please define valid value for firmware setup.
+#endif
 
 #define SET_R4_TO_ADDR(addr)        \
     lis r3, addr@h              ;   \
@@ -63,6 +119,12 @@
     stw r4, 0(r3)               ;   \
     dcbf 0, r3                  ;   \
     icbi 0, r3                  ;
+
+     .globl SC_0x25_KernelCopyData
+SC_0x25_KernelCopyData:
+    li r0, 0x2500
+    sc
+    blr
 
      .globl Syscall_0x36
 Syscall_0x36:

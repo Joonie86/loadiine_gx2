@@ -35,6 +35,7 @@ typedef int socklen_t;
 #include <curl/easy.h>
 
 void InitCurlFunctionPointers(void);
+void InitAcquireCurl(void);
 
 extern CURLcode (* n_curl_global_init)(long flags);
 extern CURL * (* n_curl_easy_init)(void);

@@ -80,6 +80,13 @@ extern int (* FSGetStatFile)(void *pClient, void *pCmd, int fd, void *buffer, in
 extern int (* FSSetPosFile)(void *pClient, void *pCmd, int fd, int pos, int error);
 extern int (* FSWriteFile)(void *pClient, void *pCmd, const void *source, int block_size, int block_count, int fd, int flag, int error);
 
+extern int (* FSBindMount)(void *pClient, void *pCmd, char *source, char *target, int error);
+extern int (* FSBindUnmount)(void *pClient, void *pCmd, char *target, int error);
+
+extern int (* FSMakeQuota)( void *pClient, void *pCmd, const char *path,u32 mode, u64 size, int errHandling);
+extern int (* FSMakeQuotaAsync)(void *pClient, void *pCmd, const char *path,u32 mode, u64 size, int errHandling,const void  *asyncParams);
+
+
 #ifdef __cplusplus
 }
 #endif

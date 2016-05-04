@@ -118,6 +118,8 @@ public:
     void drawTv(CVideo *video);
     void update(GuiController *controller);
     void updateEffects();
+
+    sigslot::signal2<GuiElement *,int> gameLauncherMenuNextClicked;
 private:
     void SetupMainView(void);
 
@@ -126,8 +128,14 @@ private:
     void OnLayoutSwitchClicked(GuiElement *element);
     void OnLayoutSwitchEffectFinish(GuiElement *element);
 
-    void OnGameLaunch(GuiGameBrowser *element, int gameIdx);
+    void OnGameLaunchMenu(GuiGameBrowser *element, int gameIdx);
+    void OnGameLaunchMenuFinish(GuiElement *element,const discHeader *header, bool result);
+
+    void OnGameLaunchGetHeader(GuiElement *element,int gameIdx, int next);
+
+    void OnGameLaunch(const discHeader *gameHdr);
     void OnGameSelectionChange(GuiGameBrowser *element, int selectedIdx);
+    void OnExternalGameSelectionChange(int selectedIdx);
 
     void OnSettingsButtonClicked(GuiElement *element);
     void OnSettingsQuit(GuiElement *element);
@@ -151,6 +159,7 @@ private:
     GuiImageData *pointerImgData[4];
     GuiImage *pointerImg[4];
     bool pointerValid[4];
+    bool launchingGame;
 };
 
 #endif //_MAIN_WINDOW_H_

@@ -28,6 +28,8 @@
 extern "C" {
 #endif
 
+extern unsigned int padscore_handle;
+
 #include <gctypes.h>
 
 #define WPAD_BUTTON_LEFT                    0x0001
@@ -61,7 +63,7 @@ extern "C" {
 #define WPAD_CLASSIC_BUTTON_RIGHT           0x8000
 
 void InitPadScoreFunctionPointers(void);
-
+void InitAcquirePadScore(void);
 
 typedef struct _KPADData
 {

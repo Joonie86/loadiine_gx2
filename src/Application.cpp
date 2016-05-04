@@ -17,11 +17,13 @@
 #include "Application.h"
 #include "dynamic_libs/os_functions.h"
 #include "gui/FreeTypeGX.h"
+#include "gui/GuiImageAsync.h"
 #include "gui/VPadController.h"
 #include "gui/WPadController.h"
 #include "game/GameList.h"
 #include "resources/Resources.h"
 #include "settings/CSettings.h"
+#include "settings/CSettingsGame.h"
 #include "sounds/SoundHandler.hpp"
 #include "system/exception_handler.h"
 #include "utils/logger.h"
@@ -41,6 +43,8 @@ Application::Application()
     controller[3] = new WPadController(GuiTrigger::CHANNEL_4);
     controller[4] = new WPadController(GuiTrigger::CHANNEL_5);
 
+    CSettings::instance()->Load();
+     
     //! reload logger to change IP to settings IP
     log_deinit();
     log_init(CSettings::getValueAsString(CSettings::DebugLoggerIP).c_str());
@@ -64,7 +68,7 @@ Application::Application()
 	//! load language
     if(!CSettings::getValueAsString(CSettings::AppLanguage).empty())
     {
-        std::string languagePath = "sd:/wiiu/apps/loadiine_gx2/language/" + CSettings::getValueAsString(CSettings::AppLanguage) + ".lang";
+        std::string languagePath = "sd:/wiiu/apps/loadiine_gx2/languages/" + CSettings::getValueAsString(CSettings::AppLanguage) + ".lang";
 		gettextLoadLanguage(languagePath.c_str());
     }
 
@@ -75,12 +79,18 @@ Application::~Application()
 {
     GameList::destroyInstance();
 
+    CSettings::instance()->Save();
+    CSettings::destroyInstance();
+	
+	CSettingsGame::destroyInstance();
+
     delete bgMusic;
 
     for(int i = 0; i < 5; i++)
         delete controller[i];
 
 	AsyncDeleter::destroyInstance();
+    GuiImageAsync::threadExit();
     Resources::Clear();
 
 	SoundHandler::DestroyInstance();

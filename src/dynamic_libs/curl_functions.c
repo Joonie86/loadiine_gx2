@@ -24,6 +24,8 @@
 #include "os_functions.h"
 #include "curl_functions.h"
 
+unsigned int libcurl_handle __attribute__((section(".data"))) = 0;
+
 EXPORT_DECL(CURLcode, n_curl_global_init, long flags);
 EXPORT_DECL(CURL *, n_curl_easy_init, void);
 EXPORT_DECL(CURLcode, n_curl_easy_setopt, CURL *curl, CURLoption option, ...);
@@ -31,11 +33,16 @@ EXPORT_DECL(CURLcode, n_curl_easy_perform, CURL *curl);
 EXPORT_DECL(void, n_curl_easy_cleanup, CURL *curl);
 EXPORT_DECL(CURLcode, n_curl_easy_getinfo, CURL *curl, CURLINFO info, ...);
 
+void InitAcquireCurl(void)
+{
+    OSDynLoad_Acquire("nlibcurl", &libcurl_handle);
+}
+
 void InitCurlFunctionPointers(void)
 {
+    InitAcquireCurl();
     unsigned int *funcPointer = 0;
-    unsigned int libcurl_handle;
-    OSDynLoad_Acquire("nlibcurl", &libcurl_handle);
+
     OS_FIND_EXPORT_EX(libcurl_handle, curl_global_init, n_curl_global_init);
     OS_FIND_EXPORT_EX(libcurl_handle, curl_easy_init, n_curl_easy_init);
     OS_FIND_EXPORT_EX(libcurl_handle, curl_easy_setopt, n_curl_easy_setopt);

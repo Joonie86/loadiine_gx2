@@ -24,13 +24,18 @@
 #include "common/common.h"
 #include "os_functions.h"
 
-unsigned int coreinit_handle = 0;
+unsigned int coreinit_handle __attribute__((section(".data"))) = 0;
 
 //!----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 //! Lib handle functions
 //!----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 EXPORT_DECL(int, OSDynLoad_Acquire, const char* rpl, u32 *handle);
 EXPORT_DECL(int, OSDynLoad_FindExport, u32 handle, int isdata, const char *symbol, void *address);
+
+//!----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+//! Security functions
+//!----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+EXPORT_DECL(int, OSGetSecurityLevel, void);
 
 //!----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 //! Thread functions
@@ -44,6 +49,7 @@ EXPORT_DECL(int, OSSetThreadPriority, void * thread, int priority);
 EXPORT_DECL(int, OSJoinThread, void * thread, int * ret_val);
 EXPORT_DECL(void, OSDetachThread, void * thread);
 EXPORT_DECL(void, OSSleepTicks, u64 ticks);
+EXPORT_DECL(u64, OSGetTick, void);
 
 //!----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 //! Mutex functions
@@ -66,6 +72,14 @@ EXPORT_DECL(void*, OSEffectiveToPhysical, const void*);
 EXPORT_DECL(int, __os_snprintf, char* s, int n, const char * format, ...);
 EXPORT_DECL(int *, __gh_errno_ptr, void);
 
+EXPORT_DECL(void, OSScreenInit, void);
+EXPORT_DECL(unsigned int, OSScreenGetBufferSizeEx, unsigned int bufferNum);
+EXPORT_DECL(int, OSScreenSetBufferEx, unsigned int bufferNum, void * addr);
+EXPORT_DECL(int, OSScreenClearBufferEx, unsigned int bufferNum, unsigned int temp);
+EXPORT_DECL(int, OSScreenFlipBuffersEx, unsigned int bufferNum);
+EXPORT_DECL(int, OSScreenPutFontEx, unsigned int bufferNum, unsigned int posX, unsigned int posY, const char * buffer);
+EXPORT_DECL(int, OSScreenEnableEx, unsigned int bufferNum, int enable);
+
 //!----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 //! Memory functions
 //!----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -83,28 +97,52 @@ EXPORT_DECL(void *, MEMDestroyExpHeap, int heap);
 EXPORT_DECL(void, MEMFreeToExpHeap, int heap, void* ptr);
 
 //!----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+//! MCP functions
+//!----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+EXPORT_DECL(int, MCP_Open, void);
+EXPORT_DECL(int, MCP_Close, int handle);
+EXPORT_DECL(int, MCP_GetOwnTitleInfo, int handle, void * data);
+
+//!----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 //! Loader functions (not real rpl)
 //!----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 EXPORT_DECL(int, LiWaitIopComplete, int unknown_syscall_arg_r3, int * remaining_bytes);
 EXPORT_DECL(int, LiWaitIopCompleteWithInterrupts, int unknown_syscall_arg_r3, int * remaining_bytes);
 EXPORT_DECL(void, addr_LiWaitOneChunk, void);
+EXPORT_DECL(void, addr_sgIsLoadingBuffer, void);
+EXPORT_DECL(void, addr_gDynloadInitialized, void);
 
 //!----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 //! Kernel function addresses
 //!----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 EXPORT_DECL(void, addr_PrepareTitle_hook, void);
 
-void InitOSFunctionPointers(void)
+//!----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+//! Other function addresses
+//!----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+EXPORT_DECL(void, DCInvalidateRange, void *buffer, uint32_t length);
+
+void InitAcquireOS(void)
 {
-    unsigned int *funcPointer = 0;
-    //!----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+      //!----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
     //! Lib handle functions
     //!----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
     EXPORT_FUNC_WRITE(OSDynLoad_Acquire, (int (*)(const char*, unsigned *))OS_SPECIFICS->addr_OSDynLoad_Acquire);
     EXPORT_FUNC_WRITE(OSDynLoad_FindExport, (int (*)(u32, int, const char *, void *))OS_SPECIFICS->addr_OSDynLoad_FindExport);
 
     OSDynLoad_Acquire("coreinit.rpl", &coreinit_handle);
+}
 
+void InitOSFunctionPointers(void)
+{
+    unsigned int *funcPointer = 0;
+
+    InitAcquireOS();
+
+    //!----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+    //! Security functions
+    //!----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+    OS_FIND_EXPORT(coreinit_handle, OSGetSecurityLevel);
     //!----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
     //! System functions
     //!----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -116,7 +154,16 @@ void InitOSFunctionPointers(void)
     OS_FIND_EXPORT(coreinit_handle, OSEffectiveToPhysical);
     OS_FIND_EXPORT(coreinit_handle, __os_snprintf);
     OS_FIND_EXPORT(coreinit_handle, __gh_errno_ptr);
+
     OSDynLoad_FindExport(coreinit_handle, 0, "_Exit", &__Exit);
+
+    OS_FIND_EXPORT(coreinit_handle, OSScreenInit);
+    OS_FIND_EXPORT(coreinit_handle, OSScreenGetBufferSizeEx);
+    OS_FIND_EXPORT(coreinit_handle, OSScreenSetBufferEx);
+    OS_FIND_EXPORT(coreinit_handle, OSScreenClearBufferEx);
+    OS_FIND_EXPORT(coreinit_handle, OSScreenFlipBuffersEx);
+    OS_FIND_EXPORT(coreinit_handle, OSScreenPutFontEx);
+    OS_FIND_EXPORT(coreinit_handle, OSScreenEnableEx);
     //!----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
     //! Thread functions
     //!----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -129,6 +176,7 @@ void InitOSFunctionPointers(void)
     OS_FIND_EXPORT(coreinit_handle, OSSetThreadPriority);
     OS_FIND_EXPORT(coreinit_handle, OSDetachThread);
     OS_FIND_EXPORT(coreinit_handle, OSSleepTicks);
+    OS_FIND_EXPORT(coreinit_handle, OSGetTick);
     //!----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
     //! Mutex functions
     //!----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -136,6 +184,12 @@ void InitOSFunctionPointers(void)
     OS_FIND_EXPORT(coreinit_handle, OSLockMutex);
     OS_FIND_EXPORT(coreinit_handle, OSUnlockMutex);
     OS_FIND_EXPORT(coreinit_handle, OSTryLockMutex);
+    //!----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+    //! MCP functions
+    //!----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+    OS_FIND_EXPORT(coreinit_handle, MCP_Open);
+    OS_FIND_EXPORT(coreinit_handle, MCP_Close);
+    OS_FIND_EXPORT(coreinit_handle, MCP_GetOwnTitleInfo);
 
     //!----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
     //! Memory functions
@@ -154,14 +208,22 @@ void InitOSFunctionPointers(void)
     OS_FIND_EXPORT(coreinit_handle, MEMFreeToExpHeap);
 
     //!----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+    //! Other function addresses
+    //!----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+    OS_FIND_EXPORT(coreinit_handle, DCInvalidateRange);
+
+    //!----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
     //! Special non library functions
     //!----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
     if(OS_FIRMWARE == 532 || OS_FIRMWARE == 540)
     {
-        EXPORT_FUNC_WRITE(LiWaitIopComplete, (int (*)(int, int *))0x0100FFA4);
-        EXPORT_FUNC_WRITE(LiWaitIopCompleteWithInterrupts, (int (*)(int, int *))0x0100FE90);
-        EXPORT_FUNC_WRITE(addr_LiWaitOneChunk, (int (*)(int, int *))0x010007EC);
-        EXPORT_FUNC_WRITE(addr_PrepareTitle_hook, (int (*)(int, int *))0xFFF18558);
+        EXPORT_FUNC_WRITE(LiWaitIopComplete, (int (*)(int, int *))0x0100FFA4);                // loader.elf
+        EXPORT_FUNC_WRITE(LiWaitIopCompleteWithInterrupts, (int (*)(int, int *))0x0100FE90);  // loader.elf
+        EXPORT_FUNC_WRITE(addr_LiWaitOneChunk, (int (*)(int, int *))0x010007EC);              // loader.elf
+        EXPORT_FUNC_WRITE(addr_PrepareTitle_hook, (int (*)(int, int *))0xFFF18558);           // kernel.elf
+
+        EXPORT_FUNC_WRITE(addr_sgIsLoadingBuffer, (int (*)(int, int *))0xEFE19D00);           // loader.elf
+        EXPORT_FUNC_WRITE(addr_gDynloadInitialized, (int (*)(int, int *))0xEFE13C3C);         // loader.elf
     }
     else if(OS_FIRMWARE == 500 || OS_FIRMWARE == 510)
     {
@@ -169,6 +231,29 @@ void InitOSFunctionPointers(void)
         EXPORT_FUNC_WRITE(LiWaitIopCompleteWithInterrupts, (int (*)(int, int *))0x0100FAB0);
         EXPORT_FUNC_WRITE(addr_LiWaitOneChunk, (int (*)(int, int *))0x010007EC);
         EXPORT_FUNC_WRITE(addr_PrepareTitle_hook, (int (*)(int, int *))0xFFF18534);
+
+        EXPORT_FUNC_WRITE(addr_sgIsLoadingBuffer, (int (*)(int, int *))0xEFE19D00);
+        EXPORT_FUNC_WRITE(addr_gDynloadInitialized, (int (*)(int, int *))0xEFE13C3C);
+    }
+    else if(OS_FIRMWARE == 410)
+    {
+        EXPORT_FUNC_WRITE(LiWaitIopComplete, (int (*)(int, int *))0x0100F78C);
+        EXPORT_FUNC_WRITE(LiWaitIopCompleteWithInterrupts, (int (*)(int, int *))0x0100F678);
+        EXPORT_FUNC_WRITE(addr_LiWaitOneChunk, (int (*)(int, int *))0x010007F8);
+        EXPORT_FUNC_WRITE(addr_PrepareTitle_hook, (int (*)(int, int *))0xFFF166DC);
+
+        EXPORT_FUNC_WRITE(addr_sgIsLoadingBuffer, (int (*)(int, int *))0xEFE19CC0);
+        EXPORT_FUNC_WRITE(addr_gDynloadInitialized, (int (*)(int, int *))0xEFE13BFC);
+    }
+    else if(OS_FIRMWARE == 400) //same for 402 and 403
+    {
+        EXPORT_FUNC_WRITE(LiWaitIopComplete, (int (*)(int, int *))0x0100F78C);
+        EXPORT_FUNC_WRITE(LiWaitIopCompleteWithInterrupts, (int (*)(int, int *))0x0100F678);
+        EXPORT_FUNC_WRITE(addr_LiWaitOneChunk, (int (*)(int, int *))0x010007F8);
+        EXPORT_FUNC_WRITE(addr_PrepareTitle_hook, (int (*)(int, int *))0xFFF15E70);
+
+        EXPORT_FUNC_WRITE(addr_sgIsLoadingBuffer, (int (*)(int, int *))0xEFE19CC0);
+        EXPORT_FUNC_WRITE(addr_gDynloadInitialized, (int (*)(int, int *))0xEFE13BFC);
     }
 	else if(OS_FIRMWARE == 550)
     {
@@ -176,10 +261,32 @@ void InitOSFunctionPointers(void)
         EXPORT_FUNC_WRITE(LiWaitIopCompleteWithInterrupts, (int (*)(int, int *))0x0101006C);
         EXPORT_FUNC_WRITE(addr_LiWaitOneChunk, (int (*)(int, int *))0x0100080C);
         EXPORT_FUNC_WRITE(addr_PrepareTitle_hook, (int (*)(int, int *))0xFFF184E4);
+
+        EXPORT_FUNC_WRITE(addr_sgIsLoadingBuffer, (int (*)(int, int *))0xEFE19E80);
+        EXPORT_FUNC_WRITE(addr_gDynloadInitialized, (int (*)(int, int *))0xEFE13DBC);
+    }
+    else if(OS_FIRMWARE == 310)
+    {
+        EXPORT_FUNC_WRITE(LiWaitIopComplete, (int (*)(int, int *))0x0100C4E4);
+        EXPORT_FUNC_WRITE(LiWaitIopCompleteWithInterrupts, (int (*)(int, int *))0x0100C3D4);
+        EXPORT_FUNC_WRITE(addr_LiWaitOneChunk, (int (*)(int, int *))0x010004D8);
+        EXPORT_FUNC_WRITE(addr_PrepareTitle_hook, (int (*)(int, int *))0xFFF15A0C);
+
+        EXPORT_FUNC_WRITE(addr_sgIsLoadingBuffer, (int (*)(int, int *))0xEFE19340);
+        EXPORT_FUNC_WRITE(addr_gDynloadInitialized, (int (*)(int, int *))0xEFE1329C);
+    }
+    else if(OS_FIRMWARE == 300)
+    {
+        EXPORT_FUNC_WRITE(LiWaitIopComplete, (int (*)(int, int *))0x0100C4E4);
+        EXPORT_FUNC_WRITE(LiWaitIopCompleteWithInterrupts, (int (*)(int, int *))0x0100C3D4);
+        EXPORT_FUNC_WRITE(addr_LiWaitOneChunk, (int (*)(int, int *))0x010004D8);
+        EXPORT_FUNC_WRITE(addr_PrepareTitle_hook, (int (*)(int, int *))0xFFF15974);
+
+        EXPORT_FUNC_WRITE(addr_sgIsLoadingBuffer, (int (*)(int, int *))0xEFE19340);
+        EXPORT_FUNC_WRITE(addr_gDynloadInitialized, (int (*)(int, int *))0xEFE1329C);
     }
     else
     {
         OSFatal("Missing all OS specific addresses.");
     }
 }
-

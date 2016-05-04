@@ -69,6 +69,12 @@ EXPORT_DECL(int, FSGetStatFile, void *pClient, void *pCmd, int fd, void *buffer,
 EXPORT_DECL(int, FSSetPosFile, void *pClient, void *pCmd, int fd, int pos, int error);
 EXPORT_DECL(int, FSWriteFile, void *pClient, void *pCmd, const void *source, int block_size, int block_count, int fd, int flag, int error);
 
+EXPORT_DECL(int, FSBindMount, void *pClient, void *pCmd, char *source, char *target, int error);
+EXPORT_DECL(int, FSBindUnmount, void *pClient, void *pCmd, char *target, int error);
+
+EXPORT_DECL(int, FSMakeQuota, void *pClient, void *pCmd, const char *path,u32 mode, u64 size, int errHandling);
+EXPORT_DECL(int, FSMakeQuotaAsync ,void *pClient, void *pCmd, const char *path,u32 mode, u64 size, int errHandling,const void  *asyncParams);
+
 void InitFSFunctionPointers(void)
 {
     unsigned int *funcPointer = 0;
@@ -117,4 +123,10 @@ void InitFSFunctionPointers(void)
     OS_FIND_EXPORT(coreinit_handle, FSGetStatFile);
     OS_FIND_EXPORT(coreinit_handle, FSSetPosFile);
     OS_FIND_EXPORT(coreinit_handle, FSWriteFile);
+
+    OS_FIND_EXPORT(coreinit_handle, FSBindMount);
+    OS_FIND_EXPORT(coreinit_handle, FSBindUnmount);
+
+    OS_FIND_EXPORT(coreinit_handle, FSMakeQuota);
+    OS_FIND_EXPORT(coreinit_handle, FSMakeQuotaAsync);
 }
